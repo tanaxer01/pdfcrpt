@@ -6,6 +6,8 @@ import (
 
 	"net/http"
 	"encoding/json"
+
+	"pdfcrpt/data"
 )
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +22,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func reciveInfo(w http.ResponseWriter, r *http.Request) {
-	var datos []string
+	var datos data.DataReceived
 	err := json.NewDecoder(r.Body).Decode(&datos)
 
 	if err != nil {
@@ -29,4 +31,8 @@ func reciveInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(datos)
+
+	w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+	io.WriteString(w, `al is god`)
 }
