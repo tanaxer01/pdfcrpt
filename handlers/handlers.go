@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 
+
 	"net"
 	"net/http"
 	"encoding/json"
@@ -37,6 +38,15 @@ func reciveInfo(w http.ResponseWriter, r *http.Request) {
 
 	data.Init()
 	data.AddData(datos)
+	defer data.DB.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "Added")
+}
+
+func giveInfo(w http.ResponseWriter, r *http.Request) {
+	data.Init()
 	filas := data.SeeData()
 	defer data.DB.Close()
 
@@ -45,5 +55,4 @@ func reciveInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
 	w.Write(ready)
-	//io.WriteString(w, filas)
 }

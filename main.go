@@ -1,16 +1,21 @@
 package main
 
 import (
+	handle "github.com/gorilla/handlers"
 	"pdfcrpt/handlers"
 	"net/http"
 
-	"fmt"
+	"log"
 )
 
 func main() {
-	fmt.Println("[+] Escuchando en el puerto 8080")
+	log.Println("[+] Escuchando en el puerto 8080")
+
+	headersOk := handle.AllowedHeaders([]string{"X-Requested-With"})
+    originsOk := handle.AllowedOrigins([]string{"*"})
+    methodsOk := handle.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
 	r := handlers.NewRouter()
-	http.ListenAndServe(":8080", r)
+	log.Fatal(http.ListenAndServe(":8000", handle.CORS(headersOk, originsOk, methodsOk)(r)))
 
 }
