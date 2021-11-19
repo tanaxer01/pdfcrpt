@@ -1,10 +1,8 @@
 package data
 
-import "time"
-
 type DataReceived struct {
+	Id			int
 	Password	string		`json:"password"`
-	IP			string		`json:"ip"`
+	IP			string
 	SO			string		`json:"so"`
-	Time		time.Time	`json:"timestamp"`
 }

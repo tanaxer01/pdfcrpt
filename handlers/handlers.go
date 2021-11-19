@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 
+	"net"
 	"net/http"
 	"encoding/json"
 
@@ -18,6 +19,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
     // In the future we could report back on the status of our DB, or our cache
     // (e.g. Redis) by performing a simple PING, and include them in the response.
     io.WriteString(w, `{"alive": true}`)
+	log.Println(r.RemoteAddr)
 }
 
 
@@ -30,9 +32,18 @@ func reciveInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(datos)
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	datos.IP = ip
+
+	data.Init()
+	data.AddData(datos)
+	filas := data.SeeData()
+	defer data.DB.Close()
+
+	ready, _ := json.Marshal(filas)
 
 	w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-	io.WriteString(w, `al is god`)
+	w.Write(ready)
+	//io.WriteString(w, filas)
 }
